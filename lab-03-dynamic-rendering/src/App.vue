@@ -41,7 +41,7 @@
     </section>
 
     <section style="margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background: #fff;">
-      <h2>Задача 3: Список товарів</h2>
+      <h2>Задача 3 та 4: Список товарів з фільтрацією</h2>
       
       <div style="margin-bottom: 20px; padding: 10px; background: #f9f9f9; border-radius: 6px; display: flex; flex-direction: column; gap: 10px;">
         <div>
@@ -62,9 +62,24 @@
         </button>
       </div>
 
+      <div style="margin-bottom: 15px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: #eee; padding: 10px; border-radius: 6px;">
+        <button @click="currentFilter = 'all'" :style="currentFilter === 'all' ? 'font-weight: bold;' : ''">Усі</button>
+        <button @click="currentFilter = 'Tech'" :style="currentFilter === 'Tech' ? 'font-weight: bold;' : ''">Електроніка</button>
+        <button @click="currentFilter = 'Clothes'" :style="currentFilter === 'Clothes' ? 'font-weight: bold;' : ''">Одяг</button>
+        
+        <span style="margin-left: auto; font-size: 14px;">
+          Показано: <strong>{{ filteredProducts.length }}</strong> з <strong>{{ products.length }}</strong>
+        </span>
+      </div>
+
       <div style="display: grid; gap: 10px;">
+        <p v-if="filteredProducts.length === 0" style="color: gray; font-style: italic; text-align: center; padding: 10px;">
+          Нічого не знайдено за цим фільтром
+        </p>
+        
         <div 
-          v-for="p in products" 
+          v-else
+          v-for="p in filteredProducts" 
           :key="p.id" 
           :class="{ 'highlight-tech': p.category === 'Tech' }"
           style="padding: 12px; border: 1px solid #ddd; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;"
@@ -79,25 +94,29 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
-// Стейт Задача 1
 const isLoading = ref(false);
 const hasError = ref(false);
 const items = ref(['Елемент А', 'Елемент Б', 'Елемент В']);
 const clearItems = () => { items.value = []; };
 const addSampleItems = () => { items.value = ['Елемент А', 'Елемент Б', 'Елемент В']; };
 
-// Стейт Задача 2
 const isPanelVisible = ref(true);
 
-// Стейт Задача 3
 const products = ref([
   { id: 1, title: 'Монітор 24"', category: 'Tech' },
-  { id: 2, title: 'Зимова куртка', category: 'Clothes' }
+  { id: 2, title: 'Зимова куртка', category: 'Clothes' },
+  { id: 3, title: 'Мишка бездротова', category: 'Tech' }
 ]);
 const newTitle = ref('');
 const newCategory = ref('Tech');
+const currentFilter = ref('all');
+
+const filteredProducts = computed(() => {
+  if (currentFilter.value === 'all') return products.value;
+  return products.value.filter(p => p.category === currentFilter.value);
+});
 
 const addProduct = () => {
   if (newTitle.value.trim() === '') return;

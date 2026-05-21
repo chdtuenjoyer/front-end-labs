@@ -1,5 +1,5 @@
 <template>
-  <div style="padding: 20px; font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <div style="padding: 20px; font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
     
     <section style="margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 8px;">
       <h2>Задача 1: Стани сторінки</h2>
@@ -24,7 +24,6 @@
       <button @click="isPanelVisible = !isPanelVisible" style="margin-bottom: 15px; padding: 6px 12px; cursor: pointer;">
         Показати/Сховати панель
       </button>
-
       <div style="display: flex; gap: 15px; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 200px;">
           <h3>Панель через v-if</h3>
@@ -32,12 +31,46 @@
             Цей блок повністю зникає і з'являється у дереві DOM сторінки.
           </div>
         </div>
-
         <div style="flex: 1; min-width: 200px;">
           <h3>Панель через v-show</h3>
           <div v-show="isPanelVisible" style="padding: 15px; background: #fff3e0; border: 1px solid #fb8c00; border-radius: 4px;">
             Цей блок завжди присутній в DOM, але приховується через CSS стиль "display: none".
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background: #fff;">
+      <h2>Задача 3: Список товарів</h2>
+      
+      <div style="margin-bottom: 20px; padding: 10px; background: #f9f9f9; border-radius: 6px; display: flex; flex-direction: column; gap: 10px;">
+        <div>
+          <label style="display: block; margin-bottom: 4px; font-weight: bold;">Назва товару:</label>
+          <input v-model="newTitle" type="text" placeholder="Введіть назву..." style="width: 100%; padding: 6px; box-sizing: border-box;" />
+        </div>
+        
+        <div>
+          <label style="display: block; margin-bottom: 4px; font-weight: bold;">Категорія (Тип):</label>
+          <select v-model="newCategory" style="width: 100%; padding: 6px;">
+            <option value="Tech">Електроніка</option>
+            <option value="Clothes">Одяг</option>
+          </select>
+        </div>
+
+        <button @click="addProduct" style="padding: 8px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+          Додати товар
+        </button>
+      </div>
+
+      <div style="display: grid; gap: 10px;">
+        <div 
+          v-for="p in products" 
+          :key="p.id" 
+          :class="{ 'highlight-tech': p.category === 'Tech' }"
+          style="padding: 12px; border: 1px solid #ddd; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;"
+        >
+          <div><strong>{{ p.title }}</strong> — {{ p.category }}</div>
+          <button @click="deleteProduct(p.id)" style="background: #e53935; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Видалити</button>
         </div>
       </div>
     </section>
@@ -48,12 +81,42 @@
 <script setup>
 import { ref } from 'vue';
 
+// Стейт Задача 1
 const isLoading = ref(false);
 const hasError = ref(false);
 const items = ref(['Елемент А', 'Елемент Б', 'Елемент В']);
-
 const clearItems = () => { items.value = []; };
 const addSampleItems = () => { items.value = ['Елемент А', 'Елемент Б', 'Елемент В']; };
 
+// Стейт Задача 2
 const isPanelVisible = ref(true);
+
+// Стейт Задача 3
+const products = ref([
+  { id: 1, title: 'Монітор 24"', category: 'Tech' },
+  { id: 2, title: 'Зимова куртка', category: 'Clothes' }
+]);
+const newTitle = ref('');
+const newCategory = ref('Tech');
+
+const addProduct = () => {
+  if (newTitle.value.trim() === '') return;
+  products.value.push({
+    id: Date.now(),
+    title: newTitle.value,
+    category: newCategory.value
+  });
+  newTitle.value = '';
+};
+
+const deleteProduct = (id) => {
+  products.value = products.value.filter(p => p.id !== id);
+};
 </script>
+
+<style scoped>
+.highlight-tech {
+  background-color: #e8f5e9 !important;
+  border-color: #2e7d32 !important;
+}
+</style>
